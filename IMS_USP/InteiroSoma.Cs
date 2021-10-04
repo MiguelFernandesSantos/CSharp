@@ -2,7 +2,7 @@
 //                                                   #
 //   NOME: MIGUEL FERNANDES SANTOS.                  #
 //   DATA: 04/10/2021                                #
-//   PROJETO: NATURAL TRIANGULAR.                    #
+//   PROJETO: SOMA DOS NUMEROS INTEIROS.             #
 //                                                   #
 //####################################################
 
