@@ -1,26 +1,106 @@
 //####################################################
 //                                                   #
 //    NOME: MIGUEL FERNANDES SANTOS.                 #
-//    DATA: 30/10/2021                               #
+//    DATA: 14/11/2021                               #
 //    PROJETO: CONTA BANCARIA.                       #
 //                                                   #
 //####################################################
-
-
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.SQLite;
+using System.IO;
 
 namespace ContaBancaria
 {
+
+    // Classe para utilizar o banco de dados:
+    class BancoDados
+    {
+
+        // Cria uma conexao global na classe:
+        public SQLiteConnection conexao;
+
+        // Cria o metodo construtor da classe:
+        public BancoDados(){
+
+            // Faz a conexão:
+            conexao = new SQLiteConnection("Data Source = Estatistica.Sqlite3");
+
+            // Verifica se ja existe criado um arquivo com o nome estatistica:
+            if (!File.Exists("./Estatistica.sqlite3"))
+            {
+                // Se não existir ele cria o arquivo:
+                SQLiteConnection.CreateFile("Estatistica.sqlite3");
+                
+            }
+            
+        }
+
+        // Metodo para abrir a conexao com o banco de dados:
+        public void AbrirConexao()
+        {
+            // Se a conexao estiver diferente de aberta ele faz a abertura da conexao:
+            if (conexao.State != System.Data.ConnectionState.Open)
+            {
+                // Abre a conexao:
+                conexao.Open();
+
+            }
+        }
+
+        public void FecharConexao()
+        {
+            // Se a conexao estiver diferente de Fechada ele faz o fechamento da conexao:
+            if (conexao.State != System.Data.ConnectionState.Closed)
+            {
+                // Fechamento da conexao:
+                conexao.Close();
+
+            }
+
+        }
+
+    }
+
     class Program
     {
+
+
         static void Main(string[] args)
         {
+            // Cria um objeto do tipo Banco de dados:
+            BancoDados BancoObjeto = new BancoDados();
+        
+            // Cria uma função  para criar uma nova tabela no banco de dados:
+            void NovaTabela()
+            {
+                // Cria uma string para ser execultada pelo banco:
+                string CriarTabela = "Create table if not exists Tb_Estatistica" +
+                                     "(Tb_Estatistica_Id integer not null primary key autoincrement," +
+                                     "Tb_Estatistica_Media decimal(10, 5)," +
+                                     "Tb_Estatistica_Moda decimal(10, 5)," +
+                                     "Tb_Estatistica_Mediana decimal(10, 5)," +
+                                     "Tb_Estatistica_PrimeiroQuartil decimal(10, 5)," +
+                                     "Tb_Estatistica_TerceiroQuartil decimal(10, 5)," +
+                                     "Tb_Estatistica_Amplitude decimal(10, 5)," +
+                                     "Tb_Estatistica_DesvioPadrao decimal(10,5))";
 
+                // Cria uma query do tipo SQLiteCommand usando a conexao do objeto banco e a string: 
+                SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, BancoObjeto.conexao);
+
+                // Abre a conexao com o banco de dados:
+                BancoObjeto.AbrirConexao();
+                // Execulta a query:
+                QueryCriarTabela.ExecuteNonQuery();
+                // Fecha a conexao:
+                BancoObjeto.FecharConexao();
+
+            }
+            
             // função para adicionar valor a sua conta:
             double Adicionar(double valor, double saldo)
             {
@@ -142,6 +222,88 @@ namespace ContaBancaria
 
             }
 
+            double PagarCredito (double Saldo, double CreditoPagar)
+            {
+                double Opcao = 0;
+                double Pagar = 0;
+
+                if(CreditoPagar <= 0)
+                {
+
+                    Console.WriteLine("Você nao possui credito a pagar.\n\n");
+                    return 0;
+
+                }
+                else
+                {
+
+                    Console.WriteLine("\nO seu credito a pagar é de " + Convert.ToString(CreditoPagar));
+
+                    Pagar = converter(Console.ReadLine());
+
+                    if(Pagar == 0)
+                    {
+
+                        Console.WriteLine("Infelizmente o valor é invalido ou igual a 0, tente novamente mais tarde!");
+                        return 0;
+
+                    }else if(Pagar > Saldo)
+                    {
+
+                        Console.WriteLine("Nao possui saldo suficiente para realizar esse pagamento, tente novamente mais tarde!!");
+
+                    }else if(Pagar > CreditoPagar)
+                    {
+
+                        while(Opcao != 1 || Opcao != 2)
+                        {
+
+                            Console.WriteLine("O valor que deseja pagar é maior que " + Convert.ToString(CreditoPagar));
+                            Console.WriteLine("Deseja pagar o valor total?\n 1 - Sim\n 2 - Não");
+
+                            Opcao = converter(Console.ReadLine());
+
+                            if(Opcao == 1)
+                            {
+
+                                Pagar = CreditoPagar;
+                                Console.WriteLine("Okay, foi pago o valor total!");
+
+                                return Pagar;
+
+                            }else if(Opcao == 2)
+                            {
+
+                                Console.WriteLine("Okay, não foi realizado o pagamento do credito");
+
+                            }
+                            else
+                            {
+
+                                Console.WriteLine("Opção invalida!!!!\n\n");
+
+                            }
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        Console.WriteLine("Foi pago um valor total de " + Convert.ToString(Pagar));
+                        return Pagar;
+
+                    }
+                    
+
+                }
+
+
+
+                return 0.0;
+
+            }
+
             // função para gerar arquivo txt do extrato na mesma pasta que o arquivo:
             void Extrato(Dictionary<string, double> valores, string Nome, List<string> extrato)
             {
@@ -183,6 +345,8 @@ namespace ContaBancaria
 
             // Declara uma lista do historico de transações:
             List<string> historico = new List<string>();
+            List<double> historicoSaldo = new List<double>();
+
             // Declara uma variavel para o nome:
             string nome = "";
             // Declara um vetor para as 3 opções de credito:
@@ -241,11 +405,11 @@ namespace ContaBancaria
                 Console.WriteLine(" 2 - " + Convert.ToString(opcoes[1]));
                 // Mostra 100% a mais:
                 Console.WriteLine(" 3 - " + Convert.ToString(opcoes[2]));
-                
+
                 // Pergunta qual das opções o usuario quer:
                 Console.WriteLine("Qual das opões acima você deseja?");
                 Pessoa["Menu"] = converter(Console.ReadLine());
-            
+
                 if (Pessoa["Menu"] == 1)
                 {
 
@@ -278,24 +442,26 @@ namespace ContaBancaria
 
             // --- FIM DO CADASTRO DA PESSOA --- //
 
+            NovaTabela();
+
             Console.WriteLine("\n\n---------- Bem Vindo ----------");
 
-            while(Dados["Menu"] != 5)
+            while (Dados["Menu"] != 5)
             {
                 double[] valores;
 
                 // Mostra o menu:
                 Console.WriteLine("\n---------- MENU ----------");
-                Console.WriteLine("\n 1 - Retirar\n 2 - Colocar\n 3 - Credito\n 4 - Extrato\n 5 - Sair\n");
+                Console.WriteLine("\n 1 - Retirar\n 2 - Colocar\n 3 - Credito\n 4 - Pagar Credito\n 5 - Transferencia\n 6 - Extrato\n 10 - Sair\n");
                 Console.WriteLine("\n---------- MENU ----------\n");
-                
+
                 Dados["Menu"] = 0;
                 // Pergunta qual a escolha do usuario:
                 Console.WriteLine("\nQual a sua escolha");
                 // Faz a leitura da escolha do usuario:
                 Dados["Menu"] = converter(Console.ReadLine());
-                
-                if(Dados["Menu"] == 1)
+
+                if (Dados["Menu"] == 1)
                 {
                     // Pergunta o valor que usuario deseja:
                     Console.WriteLine("\n\nDigite o valor que deseja retirar: ");
@@ -307,7 +473,7 @@ namespace ContaBancaria
                     historico.Add(Historico("Retirado", Dados["AuxiliarRetirar"]));
 
                 }
-                else if(Dados["Menu"] == 2)
+                else if (Dados["Menu"] == 2)
                 {
 
                     // Pergunta o valor que usuario deseja inserir:
@@ -320,7 +486,7 @@ namespace ContaBancaria
                     historico.Add(Historico("Adicionado", Dados["AuxiliarColocar"]));
 
                 }
-                else if(Dados["Menu"] == 3)
+                else if (Dados["Menu"] == 3)
                 {
 
                     // Pergunta o valor que o usuario quer de credito:
@@ -341,12 +507,27 @@ namespace ContaBancaria
                 }
                 else if(Dados["Menu"] == 4)
                 {
+                    Dados["AuxiliarRetirar"] = PagarCredito(Dados["Saldo"], Dados["CreditoPagar"]);
+                    Dados["Saldo"] = Dados["saldo"] - Dados["AuxiliarRetirar"];
+                    Dados["Credito"] = Dados["Credito"] + Dados["AuxiliarRetirar"];
+                    Dados["CreditoPagar"] = Dados["CreditoPagar"] - Dados["AuxiliarRetirar"];
+
+                    if (Dados["AuxiliarRetirar"] != 0)
+                    {
+                        historico.Add(Historico("pago a divida de credito em", Dados["AuxiliarRetirar"]));
+                        historicoSaldo.Add(Dados["Saldo"]);
+
+                    }
+
+                }
+                else if (Dados["Menu"] == 6)
+                {
 
                     // Cria o extrato no console:
                     Extrato(Dados, nome, historico);
 
                 }
-                else if(Dados["menu"] == 5)
+                else if (Dados["menu"] == 10)
                 {
 
                     // Sai do programa:
