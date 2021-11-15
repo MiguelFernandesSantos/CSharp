@@ -100,7 +100,330 @@ namespace ContaBancaria
                 BancoObjeto.FecharConexao();
 
             }
-            
+
+            // CALCULA E RETORNA A MEDIA:
+            double MediaSimples(List<double> estatistica)
+            {
+                // conta quantos elementos tem dentro da lista:
+                int tamanho = estatistica.Count;
+
+                // Declara a variavel media que se inicia com 0:
+                double media = 0;
+
+                // Faz um laço de repetição para percorrer cada um dos elementos da lista:
+                foreach (double numero in estatistica)
+                {
+                    // Adiciona na variavel media o numero atual da lista:
+                    media += numero;
+
+                }
+
+                // Faz o valor da soma dos numeros dividido pelo tamanho:
+                media = media / tamanho;
+
+                // Retorna a media:
+                return media;
+            }
+
+
+            // CALCULA E RETORNA O PRIMEIRO QUARTIL:
+            double PrimeiroQuartil(List<double> estatistica)
+            {
+
+                // Organiza em ordem crescente a lista:
+                estatistica.Sort();
+
+                // Declara a variavel indice:
+                int indice;
+
+                // Conta quantos elementos tem a lista:
+                int quantidade = estatistica.Count;
+
+                // descobre o indice do numero a ser retornado:
+                double numeroExato = quantidade / 4;
+
+                // Coloca na variavel min o valor do numero exato:
+                double min = Math.Round(numeroExato, 0);
+
+                // Declara a variavel max iniciando em 0:
+                double max = 0;
+
+                // se min ser maior que o numero exato:
+                if (min > numeroExato)
+                {
+                    // Max recebe o valor de min:
+                    max = min;
+
+                    // Min recebe o valor de min - 1:
+                    min = min - 1;
+
+                }
+                else // Se não:
+                {
+                    // max recebe min + 1:
+                    max = min + 1;
+
+                }
+
+                // Se o numero exato ser maior que min e menor que max:
+                if (numeroExato > min && numeroExato < max)
+                {
+                    // Arredonda a variavel numeroExato:
+                    numeroExato = Math.Floor(numeroExato);
+
+                }
+
+                // converte o numero exato para inteiro e coloca dentro da variavel indice:
+                indice = Convert.ToInt32(numeroExato);
+
+                // retorna o numero baseado no indice:
+                return estatistica[indice];
+
+            }
+
+
+            // CALCULA E RETORNA O SEGUNDO QUARTIL:
+            double SegundoQuartil(List<double> estatistica)
+            {
+                // Organiza em ordem crescente a lista:
+                estatistica.Sort();
+
+                // Conta quantos numeros tem dentro da lista:
+                double quantidade = estatistica.Count;
+
+                // Faz a quantidade dividido por dois:
+                double numeroExato = quantidade / 2;
+
+                // Declara a variavel indice com inicio 0:
+                int indice = 0;
+
+                // min recebe o valor arredondado de numero exato:
+                double min = Math.Round(numeroExato, 0);
+               
+                // max inicia com 0:
+                double max = 0;
+
+                // Se min ser maior que o numero exato:
+                if (min > numeroExato)
+                {
+                    // max recebe min:
+                    max = min;
+                    // Min recebe max - 1:
+                    min = min - 1;
+
+                }
+                else
+                {
+                    // se nao max recebe min + 1:
+                    max = min + 1;
+
+                }
+
+                // Se o numero exato ser maior que min e menor que max:
+                if (numeroExato > min && numeroExato < max)
+                {
+                    // numero exato recebe o inteiro mais proximo:
+                    numeroExato = Math.Floor(numeroExato);
+
+                }
+
+                // A variavel indice recebe o valor do numero exato convertido para inteiro:
+                indice = Convert.ToInt32(numeroExato);
+
+                // retorna o numero exato:
+                return estatistica[indice];
+
+            }
+
+            // CALCULA E RETORNA O TERCEIRO QUARTIL:
+            double TerceiroQuartil(List<double> estatistica)
+            {
+                // Organiza de forma crescente os valroes da lista:
+                estatistica.Sort();
+                
+                // Conta quantos valores tem dentro da lista:
+                int quantidade = estatistica.Count;
+
+                // Quantidade recebe quantidade vezes 3:
+                quantidade = quantidade * 3;
+
+                // Numero exato recebe a quantidade dividido por 4:
+                double numeroExato = quantidade / 4;
+
+                // Faz o arredondamento da variavel numero exato:
+                double min = Math.Round(numeroExato);
+                
+                // Max é declarado e se inicia com 0: 
+                double max = 0;
+
+                // Se o min ser maior que o numero exato:
+                if (min > numeroExato)
+                {
+                    // Max recebe min:
+                    max = min;
+
+                    // min recebe min menos 1:
+                    min = min - 1;
+                }
+                else // se nao:
+                {
+                    // max recebe min mais 1:
+                    max = min + 1;
+                }
+
+                // Se o numero exato ser maior que min e menor que max:
+                if (numeroExato > min && numeroExato < max)
+                {
+                    // numero exato recebe o inteiro mais proximo:
+                    numeroExato = Math.Floor(numeroExato);
+
+                }
+
+                // Converte o numeroexato para um inteiro e adiciona na variavel indice:
+                int indice = Convert.ToInt32(numeroExato);
+
+                // Retorna o numero Exato:
+                return estatistica[indice];
+
+            }
+
+            // CALCULA E RETORNA A AMPLITUDE:
+            double Amplitude(List<double> estatistica)
+            {
+                // maior recebe o maior numero da lista:
+                double maior = estatistica.Max();
+                
+                // Menor recebe o menor numero da lista:
+                double min = estatistica.Min();
+                
+                // calcula a diferenã do maior para o menor:
+                double numero = maior - min;
+                
+                // retorna o numero:
+                return numero;
+
+            }
+
+            // CALCULA E RETORNA A VARIANCIA SIMPLES:
+            double VarianciaSimples(List<double> estatistica)
+            {
+                // Declara a variavel soma:
+                double soma;
+                
+                // declara a variavel media e chama a função para calcular a media:
+                double media = MediaSimples(estatistica);
+
+                // conta quantos valores tem dentro da lista:
+                int tamanho = estatistica.Count;
+
+                // Declara a variavel indice que se inicia com 0:
+                int indice = 0;
+
+                // cria um array do tipo double que tem o mesmo tamanho da lista:
+                double[] variancias = new double[tamanho];
+
+                // faz um laço para percorre a lista:
+                foreach (double numero in estatistica)
+                {
+                    // o numero atual menos a media:
+                    double valor = numero - media;
+                    
+                    // Adiciona no array o valor calculado:
+                    variancias[indice] = valor;
+
+                    // Indice recebe ele mesmo mais 1:
+                    indice += 1;
+
+                }
+
+                // Soma recebe a soma do array:
+                soma = variancias.Sum();
+
+                // arredonda o valor da soma:
+                soma = Math.Floor(soma);
+
+                // Retorna soma:
+                return soma;
+
+            }
+
+            // CALCULA E RETORNA A VARIANCIA QUADRADA:
+            double VarianciaQuadrada(List<double> estatistica)
+            {
+                // Declara a variavel soma:
+                double soma;
+
+                // DeClara a variavel divisor:
+                double divisor;
+
+                double fim;
+
+                // Declara a variavel media e chama a função que calcula a media:
+                double media = MediaSimples(estatistica);
+
+                // Conta quantos valores existe dentro da lista:
+                int tamanho = estatistica.Count;
+
+                // Declara indice que se incia com 0:
+                int indice = 0;
+
+                // Declara um array do tipo double que possui o mesmo tamanho da lista:
+                double[] variancias = new double[tamanho];
+                
+                // Declara um array do tipo double que possui o mesmo tamanho da lista:
+                double[] varianciasQuadrada = new double[tamanho];
+
+                // Percorre cada elemento da lista:
+                foreach (double numero in estatistica)
+                {
+                    // Para cada numero faz o numero menos a media:
+                    double valor = numero - media;
+                    
+                    // Adiciona no array o valor calculado:
+                    variancias[indice] = valor;
+
+                    // Indice recebe indice mais 1:
+                    indice += 1;
+
+                }
+
+                // Indice se inicia com -:
+                indice = 0;
+
+                // Faz um laço que percorre cada uma das variancias:
+                foreach (double numero in variancias)
+                {
+                    // Para cada numero faz ele vezes ele mesmo?
+                    double valor = numero * numero;
+                    
+                    // O segundo array recebe o valor calculado:
+                    varianciasQuadrada[indice] = valor;
+
+                    // Indice recebe indice mais 1:
+                    indice += 1;
+
+                }
+
+                // Soma recebe a soma das variancias ao quadrado:
+                soma = varianciasQuadrada.Sum();
+
+                // Divisor recebe o tamanho do array:
+                divisor = varianciasQuadrada.Length;
+
+                // Divisor recebe ele mesmo menos 1:
+                divisor -= 1;
+
+                // Fim recebe a soma dividido pelo divisor?
+                fim = soma / divisor;
+
+                // Faz a raiz quadrada do valor contido em Fim:
+                fim = Math.Sqrt(fim);
+
+                // Retorna fim:
+                return fim;
+            }
+
+
             // função para adicionar valor a sua conta:
             double Adicionar(double valor, double saldo)
             {
@@ -142,8 +465,10 @@ namespace ContaBancaria
                 // Se seu credito for menor que o valor que vc deseja retirar:
                 if (valor > credito)
                 {
-
+                    // Mostra para o usuario que o valor é menor que o necessario:
                     Console.WriteLine("\nInfelizmente seu credito é menor que o necessario!!!");
+
+                    // Retorna dados:
                     return dados;
 
                 }
@@ -155,6 +480,7 @@ namespace ContaBancaria
                 // indice 2 é o valor de credito que vc ainda possui:
                 dados[2] = credito - valor;
 
+                // Retorna dados:
                 return dados;
 
             }
@@ -174,12 +500,15 @@ namespace ContaBancaria
                 }
                 catch // se nao der certo retorna 0:
                 {
-
+                    // Mostra para o usuario que o valor inserido nao é um numero:
                     Console.WriteLine("\nO valor inserido anteriormente não é um numero!!!!!");
+
+                    // Retorna 0:
                     return 0;
 
                 }
 
+                // Retorna o valor convertido:
                 return retorno;
 
             }
@@ -191,19 +520,23 @@ namespace ContaBancaria
                 // Se o saldo for menor que o valor a retirar:
                 if (saldo < valor)
                 {
-
+                    // Mostra para o usuario que o valor que deseja retirar é maior que o saldo:
                     Console.WriteLine("Infelizmente o valor que deseja retirar é maior que o seu saldo atual.");
+
+                    // Retorna o saldo:
                     return saldo;
 
                 }
-                else
+                else // Se nao:
                 {
-
+                    // saldo recebe saldo menos o valor:
                     saldo = saldo - valor;
 
                 }
 
+                // retorna saldo:
                 return saldo;
+
             }
 
             // Adiciona no historico de transaçoes:
@@ -218,68 +551,93 @@ namespace ContaBancaria
                 // A variavel frase recebe a data mais o tipo de movimento mais o valor:
                 frase = data + " - Foi " + palavra + " um valor de " + Convert.ToString(valor);
 
+                // Retorna a frase:
                 return frase;
 
             }
 
             double PagarCredito (double Saldo, double CreditoPagar)
             {
+                // Declara a variavel opçao que se inicia com 0:
                 double Opcao = 0;
+                
+                // Declara a variavel Pagar que se inicia com 0:
                 double Pagar = 0;
 
+                // Se o credito a pagar ser menor ou igual a 0
                 if(CreditoPagar <= 0)
                 {
-
+                    // Mostra para o usuario que nao possui creditos a pagar:
                     Console.WriteLine("Você nao possui credito a pagar.\n\n");
+
+                    // retorna 0:
                     return 0;
 
                 }
-                else
+                else // se nao;
                 {
-
+                    // Mostra para o usuario o valor que vc tem a pagar:
                     Console.WriteLine("\nO seu credito a pagar é de " + Convert.ToString(CreditoPagar));
 
+                    // Pagar recebe o valor que o usuario deseja pagar e chama a função que o converte para double:
                     Pagar = converter(Console.ReadLine());
 
+                    // Se pagar ser igual a 0 ou o usuario ter digitado letras:
                     if(Pagar == 0)
                     {
-
+                        // Mostra para o usuario que foi inserido um valor invalido:
                         Console.WriteLine("Infelizmente o valor é invalido ou igual a 0, tente novamente mais tarde!");
+
+                        // retorna 0:
                         return 0;
 
-                    }else if(Pagar > Saldo)
+                    }
+                    else if(Pagar > Saldo) // Se pagar ser maior que o saldo atual:
                     {
-
+                        // Mostra para o usuario que o saldo atual é insuficiente:
                         Console.WriteLine("Nao possui saldo suficiente para realizar esse pagamento, tente novamente mais tarde!!");
 
-                    }else if(Pagar > CreditoPagar)
+                        // retorna 0:
+                        return 0;
+
+                    }
+                    else if(Pagar > CreditoPagar) // se pagar ser maior que o credito a pagar:
                     {
 
+                        // Faz um laço de repetição que obriga o usuario a escolher uma das 2 opçoes:
                         while(Opcao != 1 || Opcao != 2)
                         {
 
+                            // Mostra que o valor que o usuario deseja pagar é maior que o necessario:
                             Console.WriteLine("O valor que deseja pagar é maior que " + Convert.ToString(CreditoPagar));
+
+                            // Pergunta para o usuario se deseja pagar o valor total:
                             Console.WriteLine("Deseja pagar o valor total?\n 1 - Sim\n 2 - Não");
 
+                            // faz a leitura do console e converte para double:
                             Opcao = converter(Console.ReadLine());
 
-                            if(Opcao == 1)
+                            if(Opcao == 1) // Se for igual a 1:
                             {
-
+                                // Pagar recebe creditoPagar:
                                 Pagar = CreditoPagar;
+
+                                // Mostra para o usuario que foi pago o valor total da divida:
                                 Console.WriteLine("Okay, foi pago o valor total!");
 
+                                // Return pagar:
                                 return Pagar;
 
-                            }else if(Opcao == 2)
+                            }
+                            else if(Opcao == 2) // Se for igual a 2:
                             {
-
+                                // Mostra para o usuario que não ira ser pago:
                                 Console.WriteLine("Okay, não foi realizado o pagamento do credito");
 
                             }
-                            else
+                            else // Se nao:
                             {
-
+                                // Mostra que a opção é invalida:
                                 Console.WriteLine("Opção invalida!!!!\n\n");
 
                             }
@@ -287,19 +645,19 @@ namespace ContaBancaria
                         }
 
                     }
-                    else
+                    else // Se nao:
                     {
-
+                        // Mostra para o usuario que foi pago um valor de:
                         Console.WriteLine("Foi pago um valor total de " + Convert.ToString(Pagar));
+
+                        // retorna pagar:
                         return Pagar;
 
                     }
                     
-
                 }
-
-
-
+                
+                // retorna 0:
                 return 0.0;
 
             }
@@ -365,7 +723,8 @@ namespace ContaBancaria
             Dictionary<string, double> Dados = new Dictionary<string, double>()
             {
 
-                {"Saldo", 5000 },
+                {"Saldo", 0 },
+                {"SaldoProvisorio", 0 },
                 {"Credito", 0 },
                 {"CreditoPagar", 0 },
                 {"AuxiliarRetirar", 0 },
@@ -461,7 +820,7 @@ namespace ContaBancaria
                 // Faz a leitura da escolha do usuario:
                 Dados["Menu"] = converter(Console.ReadLine());
 
-                if (Dados["Menu"] == 1)
+                if (Dados["Menu"] == 1) // Retirar
                 {
                     // Pergunta o valor que usuario deseja:
                     Console.WriteLine("\n\nDigite o valor que deseja retirar: ");
@@ -473,7 +832,7 @@ namespace ContaBancaria
                     historico.Add(Historico("Retirado", Dados["AuxiliarRetirar"]));
 
                 }
-                else if (Dados["Menu"] == 2)
+                else if (Dados["Menu"] == 2) // Inserir
                 {
 
                     // Pergunta o valor que usuario deseja inserir:
@@ -486,7 +845,7 @@ namespace ContaBancaria
                     historico.Add(Historico("Adicionado", Dados["AuxiliarColocar"]));
 
                 }
-                else if (Dados["Menu"] == 3)
+                else if (Dados["Menu"] == 3) // Pedir Credito
                 {
 
                     // Pergunta o valor que o usuario quer de credito:
@@ -505,29 +864,67 @@ namespace ContaBancaria
                     historico.Add(Historico("adicionado um credito em", valores[0]));
 
                 }
-                else if(Dados["Menu"] == 4)
+                else if(Dados["Menu"] == 4) // Pagar Credito
                 {
+                    // A varaivel recebe o retorna da funçao pagar credito:
                     Dados["AuxiliarRetirar"] = PagarCredito(Dados["Saldo"], Dados["CreditoPagar"]);
-                    Dados["Saldo"] = Dados["saldo"] - Dados["AuxiliarRetirar"];
+                    // saldo recebe o valor do saldo menos o valor retornado da funçao pagar credito:
+                    Dados["Saldo"] = Dados["Saldo"] - Dados["AuxiliarRetirar"];
+                    // Credito recebe credito mais os dados de auxiliar retirar:
                     Dados["Credito"] = Dados["Credito"] + Dados["AuxiliarRetirar"];
+                    // Creditos a pagar recebe ele mesmo menos auxiliar retirar:
                     Dados["CreditoPagar"] = Dados["CreditoPagar"] - Dados["AuxiliarRetirar"];
 
+                    // Se o valor retornado ser igual a 0:
                     if (Dados["AuxiliarRetirar"] != 0)
                     {
+                        // Adiciona o tipo de transação no historico:
                         historico.Add(Historico("pago a divida de credito em", Dados["AuxiliarRetirar"]));
+                        // Adiciona no historico de saldos o saldo atual:
                         historicoSaldo.Add(Dados["Saldo"]);
 
                     }
 
                 }
-                else if (Dados["Menu"] == 6)
+                else if(Dados["Menu"] == 5) // Transferencia
+                {
+                    // auxiliar retirar recebe o valor convertido lido pelo console:
+                    Dados["AuxiliarRetirar"] = converter(Console.ReadLine());
+                    // Saldo provisorio recebe o valor retornado da funçao retirar:
+                    Dados["SaldoProvisorio"] = Retirar(Dados["AuxiliarRetirar"], Dados["Saldo"]);
+
+                    // Se o saldo provisorio e o saldo atual serem diferentes:
+                    if (Dados["SaldoProvisorio"] != Dados["Saldo"])
+                    {
+                        // Saldo atual recebe saldo provisorio:
+                        Dados["Saldo"] = Dados["SaldoProvisorio"];
+                        // Adiciona no historico o tipo de transação:
+                        historico.Add(Historico("transferido", (Dados["Saldo"] - Dados["AuxiliarRetirar"])));
+                        // Adiciona no historico de saldos o saldo atual:
+                        historicoSaldo.Add(Dados["Saldo"]);
+
+                    }
+
+                }
+                else if (Dados["Menu"] == 6) // Extrato
                 {
 
                     // Cria o extrato no console:
                     Extrato(Dados, nome, historico);
 
                 }
-                else if (Dados["menu"] == 10)
+                else if(Dados["menu"] == 7) // Graficos
+                {
+
+                    Console.WriteLine("Infelizmente ainda nao foi desenvolvido os graficos.");
+
+                }else if(Dados["menu"] == 8)
+                {
+
+
+
+                }
+                else if (Dados["menu"] == 10) // Sair
                 {
 
                     // Sai do programa:
