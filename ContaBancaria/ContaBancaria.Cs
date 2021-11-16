@@ -101,6 +101,24 @@ namespace ContaBancaria
 
             }
 
+            void Inserirbanco(List<double> valores)
+            {
+                // cria um vetor que vai receber o retorno da funçao tudo:
+                double[] dados = Tudo(valores);
+
+                // Cria uma variavel que recebe um comando SQL:
+                string Inserir = "insert into Tb_Estatistica" +
+                                      "(Tb_Estatistica_Media, Tb_Estatistica_Moda," +
+                                      "Tb_Estatistica_Mediana, Tb_Estatistica_PrimeiroQuartil," +
+                                      "Tb_Estatistica_TerceiroQuartil, Tb_Estatistica_Amplitude," +
+                                      "Tb_Estatistica_DesvioPadrao)" +
+                                      "values (?,?,?,?,?,?,?)";
+
+                // Cria um comando em sql utilizando o variavel inserir e a conexao do objeto banco:
+                SQLiteCommand QueryInserir = new SQLiteCommand(Inserir, BancoObjeto.conexao);
+
+            }
+
             // CALCULA E RETORNA A MEDIA:
             double MediaSimples(List<double> estatistica)
             {
@@ -423,6 +441,25 @@ namespace ContaBancaria
                 return fim;
             }
 
+
+            double[] Tudo (List<Double> estatistica)
+            {
+                // Declara um vetor de 7 posiçoes:
+                double[] dados = new Double[7];
+
+                // Cada uma das posiçoes recebe um valor estatistico:
+                dados[0] = MediaSimples(estatistica);
+                dados[1] = PrimeiroQuartil(estatistica);
+                dados[2] = SegundoQuartil(estatistica);
+                dados[3] = TerceiroQuartil(estatistica);
+                dados[4] = Amplitude(estatistica);
+                dados[5] = VarianciaSimples(estatistica);
+                dados[6] = VarianciaQuadrada(estatistica);
+
+                // retorna o vetor:
+                return dados;
+
+            }
 
             // função para adicionar valor a sua conta:
             double Adicionar(double valor, double saldo)
@@ -811,7 +848,7 @@ namespace ContaBancaria
 
                 // Mostra o menu:
                 Console.WriteLine("\n---------- MENU ----------");
-                Console.WriteLine("\n 1 - Retirar\n 2 - Colocar\n 3 - Credito\n 4 - Pagar Credito\n 5 - Transferencia\n 6 - Extrato\n 10 - Sair\n");
+                Console.WriteLine("\n 1 - Retirar\n 2 - Colocar\n 3 - Credito\n 4 - Pagar Credito\n 5 - Transferencia\n 6 - Extrato\n 7 - Movimentação\n 8 - Estatistica\n 9 - Exibir Banco\n 10 - Sair\n");
                 Console.WriteLine("\n---------- MENU ----------\n");
 
                 Dados["Menu"] = 0;
@@ -822,15 +859,24 @@ namespace ContaBancaria
 
                 if (Dados["Menu"] == 1) // Retirar
                 {
-                    // Pergunta o valor que usuario deseja:
-                    Console.WriteLine("\n\nDigite o valor que deseja retirar: ");
-                    // Faz a leitura e converte o valor que o usuario digitar:
+                    // Mostra no console a frase entre aspas duplas:
+                    Console.WriteLine("Digite o valor que deseja sacar: ");
+                    // auxiliar retirar recebe o valor convertido lido pelo console:
                     Dados["AuxiliarRetirar"] = converter(Console.ReadLine());
-                    // Chama a função retirar:
-                    Dados["Saldo"] = Retirar(Dados["AuxiliarRetirar"], Dados["Saldo"]);
-                    // Adiciona no historico:
-                    historico.Add(Historico("Retirado", Dados["AuxiliarRetirar"]));
+                    // Saldo provisorio recebe o valor retornado da funçao retirar:
+                    Dados["SaldoProvisorio"] = Retirar(Dados["AuxiliarRetirar"], Dados["Saldo"]);
 
+                    // Se o saldo provisorio e o saldo atual serem diferentes:
+                    if (Dados["SaldoProvisorio"] != Dados["Saldo"])
+                    {
+                        // Saldo atual recebe saldo provisorio:
+                        Dados["Saldo"] = Dados["SaldoProvisorio"];
+                        // Adiciona no historico o tipo de transação:
+                        historico.Add(Historico("transferido", (Dados["Saldo"] - Dados["AuxiliarRetirar"])));
+                        // Adiciona no historico de saldos o saldo atual:
+                        historicoSaldo.Add(Dados["Saldo"]);
+
+                    }
                 }
                 else if (Dados["Menu"] == 2) // Inserir
                 {
@@ -888,6 +934,8 @@ namespace ContaBancaria
                 }
                 else if(Dados["Menu"] == 5) // Transferencia
                 {
+                    // Mostra no console a frase entre aspas duplas:
+                    Console.WriteLine("Digite o valor que deseja transferir");
                     // auxiliar retirar recebe o valor convertido lido pelo console:
                     Dados["AuxiliarRetirar"] = converter(Console.ReadLine());
                     // Saldo provisorio recebe o valor retornado da funçao retirar:
@@ -918,7 +966,14 @@ namespace ContaBancaria
 
                     Console.WriteLine("Infelizmente ainda nao foi desenvolvido os graficos.");
 
-                }else if(Dados["menu"] == 8)
+                }
+                else if(Dados["menu"] == 8) // Estatistica
+                {
+
+
+
+                }
+                else if(Dados["Menu"] == 9)
                 {
 
 
