@@ -79,10 +79,10 @@ namespace ContaBancaria
             BancoDados BancoObjeto = new BancoDados();
 
             // Cria uma função  para criar uma nova tabela no banco de dados:
-            void NovaTabela()
+           void NovaTabela()
             {
                 // Cria uma string para ser execultada pelo banco:
-                string CriarTabela = "Create table if not exists Tb_Estatistica" +
+               string CriarTabela = "Create table if not exists Tb_Estatistica" +
                                      "(Tb_Estatistica_Id integer not null primary key autoincrement," +
                                      "Tb_Estatistica_Media decimal(10, 5)," +
                                      "Tb_Estatistica_Moda decimal(10, 5)," +
@@ -92,13 +92,21 @@ namespace ContaBancaria
                                      "Tb_Estatistica_Amplitude decimal(10, 5)," +
                                      "Tb_Estatistica_DesvioPadrao decimal(10,5))";
 
-                // Cria uma query do tipo SQLiteCommand usando a conexao do objeto banco e a string: 
-                SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, BancoObjeto.conexao);
+               string DeletarValores = "Delete from Tb_Estatistica";
 
-                // Abre a conexao com o banco de dados:
-                BancoObjeto.AbrirConexao();
-                // Execulta a query:
+               // Cria uma query do tipo SQLiteCommand usando a conexao do objeto banco e a string:
+               SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, BancoObjeto.conexao);
+
+               // Cria uma query do tipo SQLiteCommand usando a conexao do objeto banco e a string deletar:
+               SQLiteCommand QueryDeletar = new SQLiteCommand(DeletarValores, BancoObjeto.conexao);
+
+               // Abre a conexao com o banco de dados:
+               BancoObjeto.AbrirConexao();
+
+               // Execulta a query:
                 QueryCriarTabela.ExecuteNonQuery();
+                // Execulta a query para limpar a tabela:
+                QueryDeletar.ExecuteNonQuery();
                 // Fecha a conexao:
                 BancoObjeto.FecharConexao();
 
