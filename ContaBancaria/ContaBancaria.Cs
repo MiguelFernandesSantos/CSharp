@@ -1,7 +1,7 @@
 //####################################################
 //                                                   #
 //    NOME: MIGUEL FERNANDES SANTOS.                 #
-//    DATA: 14/11/2021                               #
+//    DATA: 17/11/2021                               #
 //    PROJETO: CONTA BANCARIA.                       #
 //                                                   #
 //####################################################
@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.IO;
+using System.Data;
+
 
 namespace ContaBancaria
 {
@@ -25,7 +27,8 @@ namespace ContaBancaria
         public SQLiteConnection conexao;
 
         // Cria o metodo construtor da classe:
-        public BancoDados(){
+        public BancoDados()
+        {
 
             // Faz a conexão:
             conexao = new SQLiteConnection("Data Source = Estatistica.Sqlite3");
@@ -35,9 +38,9 @@ namespace ContaBancaria
             {
                 // Se não existir ele cria o arquivo:
                 SQLiteConnection.CreateFile("Estatistica.sqlite3");
-                
+
             }
-            
+
         }
 
         // Metodo para abrir a conexao com o banco de dados:
@@ -74,7 +77,7 @@ namespace ContaBancaria
         {
             // Cria um objeto do tipo Banco de dados:
             BancoDados BancoObjeto = new BancoDados();
-        
+
             // Cria uma função  para criar uma nova tabela no banco de dados:
             void NovaTabela()
             {
@@ -112,10 +115,59 @@ namespace ContaBancaria
                                       "Tb_Estatistica_Mediana, Tb_Estatistica_PrimeiroQuartil," +
                                       "Tb_Estatistica_TerceiroQuartil, Tb_Estatistica_Amplitude," +
                                       "Tb_Estatistica_DesvioPadrao)" +
-                                      "values (?,?,?,?,?,?,?)";
+                                      "values (@media, @primeiroQuartil, @segundoQuartil, @terceiroQuartil , @amplitude, @varianciaSimples, @varianciaQuadrada)";
 
                 // Cria um comando em sql utilizando o variavel inserir e a conexao do objeto banco:
                 SQLiteCommand QueryInserir = new SQLiteCommand(Inserir, BancoObjeto.conexao);
+
+                // Modifica os parametros (@) por valores dentro do vetor:
+                QueryInserir.Parameters.AddWithValue("@media", dados[0]);
+                QueryInserir.Parameters.AddWithValue("@primeiroQuartil", dados[1]);
+                QueryInserir.Parameters.AddWithValue("@segundoQuartil", dados[2]);
+                QueryInserir.Parameters.AddWithValue("@terceiroQuartil", dados[3]);
+                QueryInserir.Parameters.AddWithValue("@amplitude", dados[4]);
+                QueryInserir.Parameters.AddWithValue("@varianciaSimples", dados[5]);
+                QueryInserir.Parameters.AddWithValue("@varianciaQuadrada", dados[6]);
+
+                BancoObjeto.AbrirConexao();
+                QueryInserir.ExecuteNonQuery();
+                BancoObjeto.FecharConexao();
+
+            }
+
+            // Função para exibir o banco de dados:
+            void ExibirBanco()
+            {
+                // Cria uma tabela para receber os dados do banco:
+                SQLiteDataAdapter da = null;
+                DataTable Tabela = new DataTable();
+
+                // Uma query para utilizar no banco de dados:
+                string selecionar = "select * from Tb_Estatistica";
+
+                // Cria um comando interpletavel pelo sqlite: 
+                SQLiteCommand QuerySelecionar = new SQLiteCommand(selecionar, BancoObjeto.conexao);
+
+                // Abre a conexao com o banco de dados:
+                BancoObjeto.AbrirConexao();
+
+                // Executa a query para selecionar os valores da tabela:
+                // QuerySelecionar.ExecuteNonQuery();
+
+                da = new SQLiteDataAdapter(selecionar, BancoObjeto.conexao);
+
+                da.Fill(Tabela);
+
+                // Fecha a conexao com o banco de dados:
+                BancoObjeto.FecharConexao();
+
+                foreach (DataRow linha in Tabela.Rows)
+                {
+                    string mostrar;
+                    mostrar = string.Format("Media: {0} | 1Q: {1} | 2Q: {2} | 3Q: {3} | Amplitude: {4} | VarSimples: {5} | VarQuadrada: {6}", linha[1], linha[2], linha[3], linha[4], linha[5], linha[6], linha[7]);
+                    Console.WriteLine(mostrar);
+
+                }
 
             }
 
@@ -217,7 +269,7 @@ namespace ContaBancaria
 
                 // min recebe o valor arredondado de numero exato:
                 double min = Math.Round(numeroExato, 0);
-               
+
                 // max inicia com 0:
                 double max = 0;
 
@@ -258,7 +310,7 @@ namespace ContaBancaria
             {
                 // Organiza de forma crescente os valroes da lista:
                 estatistica.Sort();
-                
+
                 // Conta quantos valores tem dentro da lista:
                 int quantidade = estatistica.Count;
 
@@ -270,7 +322,7 @@ namespace ContaBancaria
 
                 // Faz o arredondamento da variavel numero exato:
                 double min = Math.Round(numeroExato);
-                
+
                 // Max é declarado e se inicia com 0: 
                 double max = 0;
 
@@ -310,13 +362,13 @@ namespace ContaBancaria
             {
                 // maior recebe o maior numero da lista:
                 double maior = estatistica.Max();
-                
+
                 // Menor recebe o menor numero da lista:
                 double min = estatistica.Min();
-                
+
                 // calcula a diferenã do maior para o menor:
                 double numero = maior - min;
-                
+
                 // retorna o numero:
                 return numero;
 
@@ -327,7 +379,7 @@ namespace ContaBancaria
             {
                 // Declara a variavel soma:
                 double soma;
-                
+
                 // declara a variavel media e chama a função para calcular a media:
                 double media = MediaSimples(estatistica);
 
@@ -345,7 +397,7 @@ namespace ContaBancaria
                 {
                     // o numero atual menos a media:
                     double valor = numero - media;
-                    
+
                     // Adiciona no array o valor calculado:
                     variancias[indice] = valor;
 
@@ -387,7 +439,7 @@ namespace ContaBancaria
 
                 // Declara um array do tipo double que possui o mesmo tamanho da lista:
                 double[] variancias = new double[tamanho];
-                
+
                 // Declara um array do tipo double que possui o mesmo tamanho da lista:
                 double[] varianciasQuadrada = new double[tamanho];
 
@@ -396,7 +448,7 @@ namespace ContaBancaria
                 {
                     // Para cada numero faz o numero menos a media:
                     double valor = numero - media;
-                    
+
                     // Adiciona no array o valor calculado:
                     variancias[indice] = valor;
 
@@ -413,7 +465,7 @@ namespace ContaBancaria
                 {
                     // Para cada numero faz ele vezes ele mesmo?
                     double valor = numero * numero;
-                    
+
                     // O segundo array recebe o valor calculado:
                     varianciasQuadrada[indice] = valor;
 
@@ -442,7 +494,7 @@ namespace ContaBancaria
             }
 
 
-            double[] Tudo (List<Double> estatistica)
+            double[] Tudo(List<Double> estatistica)
             {
                 // Declara um vetor de 7 posiçoes:
                 double[] dados = new Double[7];
@@ -456,6 +508,7 @@ namespace ContaBancaria
                 dados[5] = VarianciaSimples(estatistica);
                 dados[6] = VarianciaQuadrada(estatistica);
 
+                Console.WriteLine(dados[1]);
                 // retorna o vetor:
                 return dados;
 
@@ -593,16 +646,16 @@ namespace ContaBancaria
 
             }
 
-            double PagarCredito (double Saldo, double CreditoPagar)
+            double PagarCredito(double Saldo, double CreditoPagar)
             {
                 // Declara a variavel opçao que se inicia com 0:
                 double Opcao = 0;
-                
+
                 // Declara a variavel Pagar que se inicia com 0:
                 double Pagar = 0;
 
                 // Se o credito a pagar ser menor ou igual a 0
-                if(CreditoPagar <= 0)
+                if (CreditoPagar <= 0)
                 {
                     // Mostra para o usuario que nao possui creditos a pagar:
                     Console.WriteLine("Você nao possui credito a pagar.\n\n");
@@ -620,7 +673,7 @@ namespace ContaBancaria
                     Pagar = converter(Console.ReadLine());
 
                     // Se pagar ser igual a 0 ou o usuario ter digitado letras:
-                    if(Pagar == 0)
+                    if (Pagar == 0)
                     {
                         // Mostra para o usuario que foi inserido um valor invalido:
                         Console.WriteLine("Infelizmente o valor é invalido ou igual a 0, tente novamente mais tarde!");
@@ -629,7 +682,7 @@ namespace ContaBancaria
                         return 0;
 
                     }
-                    else if(Pagar > Saldo) // Se pagar ser maior que o saldo atual:
+                    else if (Pagar > Saldo) // Se pagar ser maior que o saldo atual:
                     {
                         // Mostra para o usuario que o saldo atual é insuficiente:
                         Console.WriteLine("Nao possui saldo suficiente para realizar esse pagamento, tente novamente mais tarde!!");
@@ -638,11 +691,11 @@ namespace ContaBancaria
                         return 0;
 
                     }
-                    else if(Pagar > CreditoPagar) // se pagar ser maior que o credito a pagar:
+                    else if (Pagar > CreditoPagar) // se pagar ser maior que o credito a pagar:
                     {
 
                         // Faz um laço de repetição que obriga o usuario a escolher uma das 2 opçoes:
-                        while(Opcao != 1 || Opcao != 2)
+                        while (Opcao != 1 || Opcao != 2)
                         {
 
                             // Mostra que o valor que o usuario deseja pagar é maior que o necessario:
@@ -654,7 +707,7 @@ namespace ContaBancaria
                             // faz a leitura do console e converte para double:
                             Opcao = converter(Console.ReadLine());
 
-                            if(Opcao == 1) // Se for igual a 1:
+                            if (Opcao == 1) // Se for igual a 1:
                             {
                                 // Pagar recebe creditoPagar:
                                 Pagar = CreditoPagar;
@@ -666,7 +719,7 @@ namespace ContaBancaria
                                 return Pagar;
 
                             }
-                            else if(Opcao == 2) // Se for igual a 2:
+                            else if (Opcao == 2) // Se for igual a 2:
                             {
                                 // Mostra para o usuario que não ira ser pago:
                                 Console.WriteLine("Okay, não foi realizado o pagamento do credito");
@@ -691,9 +744,9 @@ namespace ContaBancaria
                         return Pagar;
 
                     }
-                    
+
                 }
-                
+
                 // retorna 0:
                 return 0.0;
 
@@ -751,7 +804,6 @@ namespace ContaBancaria
             Dictionary<string, double> Pessoa = new Dictionary<string, double>()
             {
 
-                {"Salario", 0 },
                 {"Menu", 0 },
 
             };
@@ -777,17 +829,20 @@ namespace ContaBancaria
             nome = Console.ReadLine();
 
             // Faz a leitura do salario:
-            while (Pessoa["Salario"] <= 0)
+            while (Dados["Saldo"] <= 0)
             {
 
                 // Faz a leitura do seu salario ate ser maior que 0:
                 Console.WriteLine("\n\nPor favor insira seu Salario: ");
-                Pessoa["Salario"] = converter(Console.ReadLine());
+                Dados["Saldo"] = converter(Console.ReadLine());
 
             }
 
+            // Adiciona o salario inicial no historico:
+            historicoSaldo.Add(Dados["Saldo"]);
+
             // Chama a função que descobre o seu credito:
-            opcoes = SeuCredito(Pessoa["Salario"]);
+            opcoes = SeuCredito(Dados["Saldo"]);
 
             // laço que obriga o usuario a digitar uma das opções:
             while (Pessoa["Menu"] < 1 || Pessoa["Menu"] > 3)
@@ -842,7 +897,7 @@ namespace ContaBancaria
 
             Console.WriteLine("\n\n---------- Bem Vindo ----------");
 
-            while (Dados["Menu"] != 5)
+            while (Dados["Menu"] != 10)
             {
                 double[] valores;
 
@@ -872,7 +927,7 @@ namespace ContaBancaria
                         // Saldo atual recebe saldo provisorio:
                         Dados["Saldo"] = Dados["SaldoProvisorio"];
                         // Adiciona no historico o tipo de transação:
-                        historico.Add(Historico("transferido", (Dados["Saldo"] - Dados["AuxiliarRetirar"])));
+                        historico.Add(Historico("transferido", Dados["AuxiliarRetirar"]));
                         // Adiciona no historico de saldos o saldo atual:
                         historicoSaldo.Add(Dados["Saldo"]);
 
@@ -889,6 +944,8 @@ namespace ContaBancaria
                     Dados["Saldo"] = Adicionar(Dados["AuxiliarColocar"], Dados["Saldo"]);
                     // Adiciona no historico:
                     historico.Add(Historico("Adicionado", Dados["AuxiliarColocar"]));
+                    // Adiciona no historico de saldos o saldo atual:
+                    historicoSaldo.Add(Dados["Saldo"]);
 
                 }
                 else if (Dados["Menu"] == 3) // Pedir Credito
@@ -908,9 +965,11 @@ namespace ContaBancaria
                     Dados["Credito"] = Dados["Credito"] - valores[2];
                     // Adiciona no historico:
                     historico.Add(Historico("adicionado um credito em", valores[0]));
+                    // Adiciona no historico de saldos o saldo atual:
+                    historicoSaldo.Add(Dados["Saldo"]);
 
                 }
-                else if(Dados["Menu"] == 4) // Pagar Credito
+                else if (Dados["Menu"] == 4) // Pagar Credito
                 {
                     // A varaivel recebe o retorna da funçao pagar credito:
                     Dados["AuxiliarRetirar"] = PagarCredito(Dados["Saldo"], Dados["CreditoPagar"]);
@@ -932,7 +991,7 @@ namespace ContaBancaria
                     }
 
                 }
-                else if(Dados["Menu"] == 5) // Transferencia
+                else if (Dados["Menu"] == 5) // Transferencia
                 {
                     // Mostra no console a frase entre aspas duplas:
                     Console.WriteLine("Digite o valor que deseja transferir");
@@ -961,25 +1020,32 @@ namespace ContaBancaria
                     Extrato(Dados, nome, historico);
 
                 }
-                else if(Dados["menu"] == 7) // Graficos
+                else if (Dados["Menu"] == 7) // Graficos
                 {
 
                     Console.WriteLine("Infelizmente ainda nao foi desenvolvido os graficos.");
 
                 }
-                else if(Dados["menu"] == 8) // Estatistica
+                else if (Dados["Menu"] == 8) // Estatistica
                 {
+                    int tamanho = historicoSaldo.Count();
 
+                    if (tamanho > 1)
+                    {
 
+                        Inserirbanco(historicoSaldo);
+                        Console.WriteLine("Foi feito a analise estatistica, é possivel ver no menu 9\n\n");
+
+                    }
 
                 }
-                else if(Dados["Menu"] == 9)
+                else if (Dados["Menu"] == 9) // Exibir o banco:
                 {
 
-
+                    ExibirBanco();
 
                 }
-                else if (Dados["menu"] == 10) // Sair
+                else if (Dados["Menu"] == 10) // Sair
                 {
 
                     // Sai do programa:
