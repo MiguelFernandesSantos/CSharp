@@ -61,8 +61,76 @@ namespace ConsoleApp1
 
         }
 
+        public void CriarTabelaUsuario()
+        {
+
+            // String para criar tabela de login:
+            string CriarTabelaLogin = "Create table if not exists Tb_usuario" +
+                                      "(Tb_Usuario_Id integer not null primary key autoincrement," +
+                                      "Tb_Usuario_Email varchar(255) not null," +
+                                      "Tb_usuario_Senha varchar(255) not null)";
+
+            // Cria uma query do tipo SQLiteCommand usando a conexao do objeto banco e a string:
+            SQLiteCommand QueryCriarTabelaLogin = new SQLiteCommand(CriarTabelaLogin, this.conexao);
+
+            // Abre a conexao com o banco de dados:
+            this.AbrirConexao();
+
+            // Execulta a query:
+            QueryCriarTabelaLogin.ExecuteNonQuery();
+
+            // Fecha a conexao:
+            this.FecharConexao();
+
+        }
+
+        public string CadastrarUsuario(string Usuario, string Senha)
+        {
+
+            // chama o metodo para ver se o usuario existe no banco de dados:
+            int Verificar = UsuarioExiste(Usuario, Senha, "Cadastrar");
+
+            // Verifica se o usuario ja existe:
+            if (Verificar >= 1)
+            {
+
+                // Retorna uma string falando que o usuario ja existe no banco de dados:
+                return "Ja Cadastrado";
+
+            }
+            else
+            {
+
+                // String para fazer o cadastro do usuario no banco de dados:
+                string Cadastrar = "Insert into Tb_usuario (Tb_usuario_Email, Tb_usuario_Senha) Values ( @Usuario, @Senha)";
+
+                // Cria um comando em sql para fazer o cadastro, utilizando a string anterior:
+                SQLiteCommand QueryCadastrar = new SQLiteCommand(Cadastrar, this.conexao);
+
+                // Adiciona o parametro usuario:
+                QueryCadastrar.Parameters.AddWithValue("@Usuario", Usuario);
+
+                // Adiciona o parametro senha:
+                QueryCadastrar.Parameters.AddWithValue("@Senha", Senha);
+
+                // Abre a conexao com o banco de dados:
+                this.AbrirConexao();
+
+                // Execulta o comando:
+                QueryCadastrar.ExecuteNonQuery();
+
+                // Fecha a conexão com o banco de dados:
+                this.FecharConexao();
+
+                // Retorna uma string falando que foi realizado com sucesso o cadastro no banco de dados:
+                return "Cadastro realizado";
+
+            }
+
+        }
+
         // Metodo login:
-        public int Login(string Usuario, string Senha)
+        public int UsuarioExiste(string Usuario, string Senha, string Tipo)
         {
 
             // Declara uma variavel do tipo inteiro para armazenar a quantidade de valores retornados pela query Select:
@@ -75,7 +143,7 @@ namespace ConsoleApp1
             DataTable TabelaDados = new DataTable();
 
             // Cria uma string para ser utilizada como uma query SQL:
-            string SelectLogin = String.Format("select Tb_Usuario_Email, Tb_Usuario_Senha from Tb_Usuario Where Tb_Usuario_Email = {0}, Tb_Usuario_Senha = {1}", Usuario, Senha);
+            string SelectLogin = String.Format("select Tb_Usuario_Id ,Tb_Usuario_Email, Tb_Usuario_Senha from Tb_Usuario Where Tb_Usuario_Email = '{0}' and Tb_Usuario_Senha = '{1}'", Usuario, Senha);
 
             // Adiciona no adaptador os valores retornados da Query acima:
             Adaptador = new SQLiteDataAdapter(SelectLogin, this.conexao);
@@ -86,49 +154,22 @@ namespace ConsoleApp1
             // A variavel quantidadeRegistros recebe o numero de linhas retornados:
             QuantidadeRegistros = TabelaDados.Rows.Count;
 
-            // O metodo retorna o numero de registros:
-            return QuantidadeRegistros;
-
-        }
-
-        // Metodo para inserir nas tabelas:
-        public void Inserir(string TabelaNome, List<string> ListaOndeInserir, List<string> ListaValoresInserir)
-        {
-
-            // String inicial para inserir no banco de dados:
-            string inserir = "Insert into" + TabelaNome + "(";
-
-            // Variavel para receber o tamanho da lista:
-            int tamanho = ListaOndeInserir.Count;
-
-            // Laço de repetição para percorrer a lista:
-            for (int x = 1; x <= tamanho; x++)
+            if (Tipo == "Cadastrar")
             {
-
-                // Se é o primeiro vez dentro do laço:
-                if (x == 1)
-                {
-
-                    // Adiciona na string a coluna do banco de dados sem a virgula:
-                    inserir = inserir + ListaOndeInserir[x];
-
-                }
-                else if (x < tamanho) // se nao se:
-                {
-
-                    // Se nao ser a ultima vez do laço de repetição adiciona uma virgula na string e o novo local:
-                    inserir = inserir + "," + ListaOndeInserir[x];
-
-                }
-                else
-                {
-
-                    // se for a ultima vez do laço adiciona a virgula, o valor da variavel e por ultima fecha o parenteses:
-                    inserir = inserir + "," + ListaOndeInserir[x] + ") Values (";
-
-                }
+            
+                // O metodo retorna o numero de registros:
+                return QuantidadeRegistros;
 
             }
+            else
+            {
+
+                int id = Convert.ToInt32(TabelaDados.Rows[0][0]);
+
+                return 1;
+
+            }
+
 
         }
 
@@ -262,6 +303,17 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
 
+            // Cria o objeto banco de dados:
+            BancoDados MeuBanco = new BancoDados();
+
+            // Cria a tabela usuario:
+            MeuBanco.CriarTabelaUsuario();
+
+            // Cadastra no banco de dados um usuario:
+            MeuBanco.CadastrarUsuario("Miguel", "MiguelFernandes");
+
+            // verifica se existe no banco de dados:
+            MeuBanco.UsuarioExiste("Miguel", "MiguelFernandes", "Login");
 
 
         }
