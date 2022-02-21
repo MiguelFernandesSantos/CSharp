@@ -125,8 +125,35 @@ namespace ConsoleApp1
 
             // abrir a conexao com o banco de dados:
             this.AbrirConexao();
-            
+
             // execulta a query atual:
+            QueryCriarTabela.ExecuteNonQuery();
+
+            // Fecha a conexao com o banco de dados:
+            this.FecharConexao();
+
+        }
+
+        // Metodo para criar a tabela cliente:
+        public void CriarTabelaCliente()
+        {
+
+            // string utilizada para criar a tabela cliente:
+            string CriarTabela = "Create Table If Not Exists Tb_Cliente (" +
+                                 "Tb_Cliente_Id Int Primary Key autoincrement," +
+                                 "Tb_Cliente_Nome Varchar(150) Not null, " +
+                                 "Tb_Cliente_Cep Varchar(25) Not null," +
+                                 "Tb_Cliente_Bairro Varchar(100) Not Null," +
+                                 "Tb_Cliente_Logradouro Varchar(100) Not Null," +
+                                 "Tb_Cliente_Uf char(2) Not null)";
+
+            // cria uma query em sql para criar a tabela:
+            SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
+
+            // Abre a conexao com o banco de dados:
+            this.AbrirConexao();
+
+            // Execulta a query:
             QueryCriarTabela.ExecuteNonQuery();
 
             // Fecha a conexao com o banco de dados:
