@@ -84,6 +84,56 @@ namespace ConsoleApp1
 
         }
 
+        public void CriarTabelaProduto()
+        {
+
+            // String utilizada para criar a tabela no banco de dados:
+            string CriarTabela = "Create Table If Not Exists Tb_Produto (" +
+                                 "Tb_Produto_Id Int Primary Key AutoIncrement," +
+                                 "Tb_Produto_Fornecedor int Not Null" +
+                                 "Tb_Produto_Nome Varchar(125) Not null," +
+                                 "Tb_Produto_Valor Double(10,2) Not null)";
+
+            // criançao de um comando em sqlite para criar a tabela:
+            SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
+
+            // Abrir a conexao com o banco de dados:
+            this.AbrirConexao();
+
+            // execulta a query:
+            QueryCriarTabela.ExecuteNonQuery();
+
+            // Fecha a conexao com o banco de dados:
+            this.FecharConexao();
+
+        }
+
+        public void CriarTabelaFornecedor()
+        {
+
+            // string para criar a tabela:
+            string CriarTabela = "Create Table if not exists Tb_Fornecedor (" +
+                                 "Tb_Fornecedor_Id int primary key autoincrement," +
+                                 "Tb_Fornecedor_Nome Varchar(150) Not null," +
+                                 "Tb_Fornecedor_Cep Varchar(25) Not null," +
+                                 "Tb_Fornecedor_Logradouro Varchar(100) Not null," +
+                                 "Tb_Fornecedor_Bairro Varchar(100) Not null," +
+                                 "Tb_Fornecedor_Uf char(2) Not null)";
+
+            // criando um comando em sqlite:
+            SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
+
+            // abrir a conexao com o banco de dados:
+            this.AbrirConexao();
+            
+            // execulta a query atual:
+            QueryCriarTabela.ExecuteNonQuery();
+
+            // Fecha a conexao com o banco de dados:
+            this.FecharConexao();
+
+        }
+
         public string CadastrarUsuario(string Usuario, string Senha)
         {
 
@@ -156,17 +206,20 @@ namespace ConsoleApp1
 
             if (Tipo == "Cadastrar")
             {
-            
+
                 // O metodo retorna o numero de registros:
                 return QuantidadeRegistros;
 
             }
-            else
+            else // Login:
             {
 
+                // O select retorna 3 colunas da tabela e a primeira é o ID
+                // O codigo abaixo retorna o ID do usuario atual:
                 int id = Convert.ToInt32(TabelaDados.Rows[0][0]);
 
-                return 1;
+                // retorna o id:
+                return id;
 
             }
 
@@ -296,6 +349,8 @@ namespace ConsoleApp1
 
         }
 
+
+
     }
 
     class Program
@@ -314,7 +369,6 @@ namespace ConsoleApp1
 
             // verifica se existe no banco de dados:
             MeuBanco.UsuarioExiste("Miguel", "MiguelFernandes", "Login");
-
 
         }
     }
