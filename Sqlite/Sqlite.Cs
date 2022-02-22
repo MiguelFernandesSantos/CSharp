@@ -91,8 +91,7 @@ namespace ConsoleApp1
             string CriarTabela = "Create Table If Not Exists Tb_Produto (" +
                                  "Tb_Produto_Id Int Primary Key AutoIncrement," +
                                  "Tb_Produto_Fornecedor int Not Null" +
-                                 "Tb_Produto_Nome Varchar(125) Not null," +
-                                 "Tb_Produto_Valor Double(10,2) Not null)";
+                                 "Tb_Produto_Nome Varchar(125) Not null)";
 
             // criançao de um comando em sqlite para criar a tabela:
             SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
@@ -148,6 +147,30 @@ namespace ConsoleApp1
                                  "Tb_Cliente_Uf char(2) Not null)";
 
             // cria uma query em sql para criar a tabela:
+            SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
+
+            // Abre a conexao com o banco de dados:
+            this.AbrirConexao();
+
+            // Execulta a query:
+            QueryCriarTabela.ExecuteNonQuery();
+
+            // Fecha a conexao com o banco de dados:
+            this.FecharConexao();
+
+        }
+
+        public void CriarTabelaVenda()
+        {
+
+            // Criando a tabela venda:
+            string CriarTabela = "Create Table If not exists Tb_Venda (" +
+                                 "Tb_Venda_Id Int Primary Key Auoincrement, " +
+                                 "Tb_Venda_Produto Int Not null, " +
+                                 "Tb_Venda_Cliente Int Not null, " +
+                                 "Tb_Venda_Valor double(10,2) Not null) ";
+
+            // Criando a query para criar a tabela venda:
             SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
 
             // Abre a conexao com o banco de dados:
@@ -238,7 +261,7 @@ namespace ConsoleApp1
                 return QuantidadeRegistros;
 
             }
-            else // Login:
+            else // Login ou Update:
             {
 
                 // O select retorna 3 colunas da tabela e a primeira é o ID
@@ -250,11 +273,39 @@ namespace ConsoleApp1
 
             }
 
+        }
+
+        public void UpdateUsuario(string usuario, string senha,string novaSenha)
+        {
+
+            // Chama o metodo que retorna o id do usuario:
+            int Id= this.UsuarioExiste(usuario, senha, "Update");
+
+            // cria uma string para atualizar os dados:
+            string Atualizar = "Update Tb_Usuario Set Tb_Usuario_Senha = @Senha Where Tb_Usuario_Id = @Id";
+
+            // Cria uma query para atualizar o banco de dados:
+            SQLiteCommand QueryAtualizar = new SQLiteCommand(Atualizar, this.conexao);
+
+            // troca o @Senha pela variavel nova senha:
+            QueryAtualizar.Parameters.AddWithValue("@Senha", novaSenha);
+
+            // troca o @Id pela variavel Id:
+            QueryAtualizar.Parameters.AddWithValue("@Id", Id);
+
+            // Abre a conexao com o banco de dados:
+            this.AbrirConexao();
+
+            // Execulta a query:
+            QueryAtualizar.ExecuteNonQuery();
+
+            // Fecha a conexao com o banco de dados:
+            this.FecharConexao();
 
         }
 
         // Metodo para inserir nas tabelas:
-        public void Inserir(string TabelaNome, List<string> ListaOndeInserir, List<List<string>> ListaValoresInserir)
+        public void InserirGeral(string TabelaNome, List<string> ListaOndeInserir, List<List<string>> ListaValoresInserir)
         {
 
             // String inicial para inserir no banco de dados:
@@ -356,7 +407,7 @@ namespace ConsoleApp1
         }
 
         // metodo para deletar valores no banco de dados:
-        public void deletar(string tabela, string Coluna, string condicao)
+        public void Deletar(string tabela, string Coluna, string condicao)
         {
 
             // cria uma string para ser utilizada para deletar valores no banco de dados:
@@ -376,7 +427,12 @@ namespace ConsoleApp1
 
         }
 
+    }
 
+    public void SelecionarVenda()
+    {
+
+        string SelecionarVenda = "Select * from Tb_Venda Full Join Tb_cliente on Tb_Venda_Cliente = Tb_Venda";
 
     }
 
