@@ -89,8 +89,8 @@ namespace ConsoleApp1
 
             // String utilizada para criar a tabela no banco de dados:
             string CriarTabela = "Create Table If Not Exists Tb_Produto (" +
-                                 "Tb_Produto_Id Int Primary Key AutoIncrement," +
-                                 "Tb_Produto_Fornecedor int Not Null" +
+                                 "Tb_Produto_Id Integer Primary Key AutoIncrement," +
+                                 "Tb_Produto_Fornecedor int Not Null," +
                                  "Tb_Produto_Nome Varchar(125) Not null)";
 
             // criançao de um comando em sqlite para criar a tabela:
@@ -112,7 +112,7 @@ namespace ConsoleApp1
 
             // string para criar a tabela:
             string CriarTabela = "Create Table if not exists Tb_Fornecedor (" +
-                                 "Tb_Fornecedor_Id int primary key autoincrement," +
+                                 "Tb_Fornecedor_Id integer primary key autoincrement," +
                                  "Tb_Fornecedor_Nome Varchar(150) Not null," +
                                  "Tb_Fornecedor_Cep Varchar(25) Not null," +
                                  "Tb_Fornecedor_Logradouro Varchar(100) Not null," +
@@ -139,7 +139,7 @@ namespace ConsoleApp1
 
             // string utilizada para criar a tabela cliente:
             string CriarTabela = "Create Table If Not Exists Tb_Cliente (" +
-                                 "Tb_Cliente_Id Int Primary Key autoincrement," +
+                                 "Tb_Cliente_Id Integer Primary Key autoincrement," +
                                  "Tb_Cliente_Nome Varchar(150) Not null, " +
                                  "Tb_Cliente_Cep Varchar(25) Not null," +
                                  "Tb_Cliente_Bairro Varchar(100) Not Null," +
@@ -165,7 +165,7 @@ namespace ConsoleApp1
 
             // Criando a tabela venda:
             string CriarTabela = "Create Table If not exists Tb_Venda (" +
-                                 "Tb_Venda_Id Int Primary Key Auoincrement, " +
+                                 "Tb_Venda_Id Integer Primary Key Auoincrement, " +
                                  "Tb_Venda_Produto Int Not null, " +
                                  "Tb_Venda_Cliente Int Not null, " +
                                  "Tb_Venda_Valor double(10,2) Not null) ";
@@ -229,6 +229,97 @@ namespace ConsoleApp1
 
         }
 
+        public void CadastrarClienteFornecedor(string tabela, string nome, string cep, string bairro, string logradouro, string uf)
+        {
+
+            // string para adicionar:
+            string AdicionarCliente = "Insert into Tb_" + tabela + "( Tb_" + tabela + "_Nome," +
+                                      "Tb_" + tabela + "_Cep, Tb_" + tabela + "_Bairro," +
+                                      "Tb_" + tabela + "_Logradouro, Tb_" + tabela + "_Uf) values (" +
+                                      "@Nome, @Cep, @Bairro, @Logradouro, @Uf)";
+
+            // criançao de uma query em sqlite:
+            SQLiteCommand QueryAdicionarCliente = new SQLiteCommand(AdicionarCliente, this.conexao);
+
+            // adicionando o parametro tabela:
+            QueryAdicionarCliente.Parameters.AddWithValue("@tabela", tabela);
+
+            // adicionando o parametro Nome:
+            QueryAdicionarCliente.Parameters.AddWithValue("@Nome", nome);
+
+            // adicionando o parametro Cep:
+            QueryAdicionarCliente.Parameters.AddWithValue("@Cep", cep);
+
+            // Adicionando o parametro Bairro:
+            QueryAdicionarCliente.Parameters.AddWithValue("@Bairro", bairro);
+
+            // Adicionando o parametro Logradouro:
+            QueryAdicionarCliente.Parameters.AddWithValue("@Logradouro", logradouro);
+
+            // adicionando o parametro Uf:
+            QueryAdicionarCliente.Parameters.AddWithValue("@Uf", uf);
+
+            // Abrindo a conexao com o banco de dados:
+            this.AbrirConexao();
+
+            // execultando o comando sql:
+            QueryAdicionarCliente.ExecuteNonQuery();
+
+            // Fechando a conexao:
+            this.FecharConexao();
+
+        }
+
+        public void AdicionarProduto(int fornecedor, string nome)
+        {
+
+            // String para inserir produto:
+            string InserirProduto = "Insert into Tb_Produto ( Tb_Produto_Fornecedor," +
+                                    "Tb_Produto_Nome) values (@Fornecedor, @Nome)";
+
+            // comando sql para inserir produtos:
+            SQLiteCommand QueryInserirProduto = new SQLiteCommand(InserirProduto, this.conexao);
+
+            // passando os parametro fornecedor:
+            QueryInserirProduto.Parameters.AddWithValue("@Fornecedor", fornecedor);
+
+            // passando o parametro Nome:
+            QueryInserirProduto.Parameters.AddWithValue("@Nome", nome);
+
+            // abrir a conexao com o banco de dados:
+            this.AbrirConexao();
+
+            // execulta o comando sql:
+            QueryInserirProduto.ExecuteNonQuery();
+
+            // Fecha a conexao com o banco de dados:
+            this.FecharConexao();
+
+        }
+
+        public void AdicionarVenda(int produto, int cliente, double valor)
+        {
+
+            string inserirVenda = "Insert into Tb_venda (" +
+                                  "Tb_venda_Produto, Tb_venda_Cliente, Tb_venda_Valor)" +
+                                  "values ( @Produto, @Cliente, @Valor)";
+
+            SQLiteCommand QueryInserirVenda = new SQLiteCommand(inserirVenda, this.conexao);
+
+            QueryInserirVenda.Parameters.AddWithValue("@Produto", produto);
+
+            QueryInserirVenda.Parameters.AddWithValue("@Cliente", cliente);
+
+            QueryInserirVenda.Parameters.AddWithValue("@Valor", valor);
+
+            this.AbrirConexao();
+
+            QueryInserirVenda.ExecuteNonQuery();
+
+            this.FecharConexao();
+
+        }
+
         // Metodo login:
         public int UsuarioExiste(string Usuario, string Senha, string Tipo)
         {
@@ -275,11 +366,11 @@ namespace ConsoleApp1
 
         }
 
-        public void UpdateUsuario(string usuario, string senha,string novaSenha)
+        public void UpdateUsuario(string usuario, string senha, string novaSenha)
         {
 
             // Chama o metodo que retorna o id do usuario:
-            int Id= this.UsuarioExiste(usuario, senha, "Update");
+            int Id = this.UsuarioExiste(usuario, senha, "Update");
 
             // cria uma string para atualizar os dados:
             string Atualizar = "Update Tb_Usuario Set Tb_Usuario_Senha = @Senha Where Tb_Usuario_Id = @Id";
@@ -427,14 +518,33 @@ namespace ConsoleApp1
 
         }
 
+
+        // Selecionar com join:
+        public DataTable SelecionarVendas()
+        {
+
+            // declaração de um adaptador:
+            SQLiteDataAdapter Adapatador = null;
+
+            // declaração de uma tabela de dados:
+            DataTable TabelaDados = new DataTable();
+
+            // declaração de uma string para ser utilizada para a criação do comando sql:
+            string SelecionarVendas = "Select * from Tb_Vendas inner join Tb_Cliente On Tb_Vendas.Tb_Vendas_Cliente = Tb_Clientes_Id";
+
+            // faz o adapatador receber valores retornados do comando sql:
+            Adapatador = new SQLiteDataAdapter(SelecionarVendas, this.conexao);
+
+            // passa para a tabela de dados o conteudo do adaptador:
+            Adapatador.Fill(TabelaDados);
+
+            // retorna a tabela de dados:
+            return TabelaDados;
+
+        }
+
     }
 
-    public void SelecionarVenda()
-    {
-
-        string SelecionarVenda = "Select * from Tb_Venda Full Join Tb_cliente on Tb_Venda_Cliente = Tb_Venda";
-
-    }
 
     class Program
     {
@@ -447,11 +557,35 @@ namespace ConsoleApp1
             // Cria a tabela usuario:
             MeuBanco.CriarTabelaUsuario();
 
+            MeuBanco.CriarTabelaCliente();
+
+            MeuBanco.CriarTabelaFornecedor();
+
+            MeuBanco.CriarTabelaProduto();
+
             // Cadastra no banco de dados um usuario:
             MeuBanco.CadastrarUsuario("Miguel", "MiguelFernandes");
 
             // verifica se existe no banco de dados:
             MeuBanco.UsuarioExiste("Miguel", "MiguelFernandes", "Login");
+
+            // Cadastrar um cliente:
+            MeuBanco.CadastrarClienteFornecedor("Cliente", "Lojinha do seu antonio", "06535-030", "São pedro", "Rua jose pedroso filho", "Sp");
+
+            // adicionando um fornecedor:
+            MeuBanco.CadastrarClienteFornecedor("Fornecedor", "Aqui tem caro", "06535-030", "São luiz", "Rua marcio filho", "Sp");
+
+            // adicionando um fornecedor:
+            MeuBanco.CadastrarClienteFornecedor("Fornecedor", "luizinho", "06535-030", "São luiz", "Rua marcio filho", "Sp");
+
+            // adicionando um produto:
+            MeuBanco.AdicionarProduto(1, "Carro");
+
+            // adicionando um produto:
+            MeuBanco.AdicionarProduto(2, "Moto");
+
+            // mostra no console que rodo:
+            Console.WriteLine("Rodo tudo familia");
 
         }
     }
