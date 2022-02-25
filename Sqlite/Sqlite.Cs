@@ -165,7 +165,7 @@ namespace ConsoleApp1
 
             // Criando a tabela venda:
             string CriarTabela = "Create Table If not exists Tb_Venda (" +
-                                 "Tb_Venda_Id Integer Primary Key Auoincrement, " +
+                                 "Tb_Venda_Id Integer Primary Key Autoincrement, " +
                                  "Tb_Venda_Produto Int Not null, " +
                                  "Tb_Venda_Cliente Int Not null, " +
                                  "Tb_Venda_Valor double(10,2) Not null) ";
@@ -300,8 +300,8 @@ namespace ConsoleApp1
         public void AdicionarVenda(int produto, int cliente, double valor)
         {
 
-            string inserirVenda = "Insert into Tb_venda (" +
-                                  "Tb_venda_Produto, Tb_venda_Cliente, Tb_venda_Valor)" +
+            string inserirVenda = "Insert into Tb_Venda (" +
+                                  "Tb_Venda_Produto, Tb_Venda_Cliente, Tb_Venda_Valor)" +
                                   "values ( @Produto, @Cliente, @Valor)";
 
             SQLiteCommand QueryInserirVenda = new SQLiteCommand(inserirVenda, this.conexao);
@@ -530,7 +530,9 @@ namespace ConsoleApp1
             DataTable TabelaDados = new DataTable();
 
             // declaração de uma string para ser utilizada para a criação do comando sql:
-            string SelecionarVendas = "Select * from Tb_Vendas inner join Tb_Cliente On Tb_Vendas.Tb_Vendas_Cliente = Tb_Clientes_Id";
+            string SelecionarVendas = "select Tb_Cliente.Tb_Cliente_Nome, Tb_Produto.tb_produto_nome, tb_venda_valor Tb from Tb_Venda " +
+                                      "inner Join Tb_Cliente on Tb_Cliente.Tb_Cliente_Id = Tb_Venda.Tb_venda_Cliente " +
+                                      "Inner Join Tb_Produto on Tb_Produto.tb_produto_id = Tb_Venda.tb_venda_produto";
 
             // faz o adapatador receber valores retornados do comando sql:
             Adapatador = new SQLiteDataAdapter(SelecionarVendas, this.conexao);
@@ -557,11 +559,17 @@ namespace ConsoleApp1
             // Cria a tabela usuario:
             MeuBanco.CriarTabelaUsuario();
 
+            // cria a tabela cliente:
             MeuBanco.CriarTabelaCliente();
 
+            // cria a tabela fornecedor:
             MeuBanco.CriarTabelaFornecedor();
 
+            // cria a tabela produto:
             MeuBanco.CriarTabelaProduto();
+
+            // cria a tabela venda:
+            MeuBanco.CriarTabelaVenda();
 
             // Cadastra no banco de dados um usuario:
             MeuBanco.CadastrarUsuario("Miguel", "MiguelFernandes");
@@ -583,6 +591,35 @@ namespace ConsoleApp1
 
             // adicionando um produto:
             MeuBanco.AdicionarProduto(2, "Moto");
+
+            // adicionando vendas:
+            MeuBanco.AdicionarVenda(1,1,500.00);
+
+            // adicionando vendas:
+            MeuBanco.AdicionarVenda(1, 2, 500.00);
+
+            MeuBanco.Deletar("Tb_Venda", "Tb_Venda_Id", "2");
+
+            // recebe a tabela de dados:
+            DataTable Tabela = MeuBanco.SelecionarVendas();
+
+            // Laço para percorrer cada linha da tabela::
+            for(int x = 0; x <= (Convert.ToInt16(Tabela.Rows.Count) - 1); x++)
+            {
+
+                // laço para percorrer os 3 valores das linhas:
+                for(int i = 0; i <= 2; i++)
+                {
+
+                    // Mostra no console:
+                    Console.WriteLine("Valor: " + Convert.ToString(Tabela.Rows[x][i]));
+
+                }
+
+                // coloca uma linha para separar:
+                Console.WriteLine("-----------------------\n\n\n");
+
+            }
 
             // mostra no console que rodo:
             Console.WriteLine("Rodo tudo familia");
