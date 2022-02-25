@@ -91,7 +91,9 @@ namespace ConsoleApp1
             string CriarTabela = "Create Table If Not Exists Tb_Produto (" +
                                  "Tb_Produto_Id Integer Primary Key AutoIncrement," +
                                  "Tb_Produto_Fornecedor int Not Null," +
-                                 "Tb_Produto_Nome Varchar(125) Not null)";
+                                 "Tb_Produto_Nome Varchar(125) Not null," +
+                                 "FOREIGN key(Tb_Produto_Fornecedor) " +
+                                 "REFERENCES Tb_Fornecedor(Tb_Fornecedor_Id))";
 
             // criançao de um comando em sqlite para criar a tabela:
             SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
@@ -168,7 +170,11 @@ namespace ConsoleApp1
                                  "Tb_Venda_Id Integer Primary Key Autoincrement, " +
                                  "Tb_Venda_Produto Int Not null, " +
                                  "Tb_Venda_Cliente Int Not null, " +
-                                 "Tb_Venda_Valor double(10,2) Not null) ";
+                                 "Tb_Venda_Valor double(10,2) Not null, " +
+                                 "FOREIGN key(Tb_Venda_Produto) " +
+                                 "REFERENCES tb_produto(tb_produto_Id), " +
+                                 "FOREIGN key(Tb_Venda_Cliente) " +
+                                 "REFERENCES tb_cliente(tb_cliente_Id))";
 
             // Criando a query para criar a tabela venda:
             SQLiteCommand QueryCriarTabela = new SQLiteCommand(CriarTabela, this.conexao);
@@ -634,6 +640,7 @@ namespace ConsoleApp1
             // mostra no console que rodo:
             Console.WriteLine("Rodo tudo familia");
 
+            Console.ReadLine();
         }
     }
 }
