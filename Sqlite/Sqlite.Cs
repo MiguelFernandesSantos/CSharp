@@ -297,25 +297,34 @@ namespace ConsoleApp1
 
         }
 
+        // Metodo para adicionar venda:
         public void AdicionarVenda(int produto, int cliente, double valor)
         {
 
+            // string utilizada para adicionar a venda:
             string inserirVenda = "Insert into Tb_Venda (" +
                                   "Tb_Venda_Produto, Tb_Venda_Cliente, Tb_Venda_Valor)" +
                                   "values ( @Produto, @Cliente, @Valor)";
 
+            // query para ser execultada:
             SQLiteCommand QueryInserirVenda = new SQLiteCommand(inserirVenda, this.conexao);
 
+            // adiciona o parametro produto:
             QueryInserirVenda.Parameters.AddWithValue("@Produto", produto);
 
+            // adiciona o parametro cliente:
             QueryInserirVenda.Parameters.AddWithValue("@Cliente", cliente);
 
+            // adiciona o parametro valor:
             QueryInserirVenda.Parameters.AddWithValue("@Valor", valor);
 
+            // Abre a conexao com o banco de dados:
             this.AbrirConexao();
 
+            // Execulta a query:
             QueryInserirVenda.ExecuteNonQuery();
 
+            // Fecha a conexao com o banco de dados:
             this.FecharConexao();
 
         }
@@ -593,22 +602,23 @@ namespace ConsoleApp1
             MeuBanco.AdicionarProduto(2, "Moto");
 
             // adicionando vendas:
-            MeuBanco.AdicionarVenda(1,1,500.00);
+            MeuBanco.AdicionarVenda(1, 1, 500.00);
 
             // adicionando vendas:
             MeuBanco.AdicionarVenda(1, 2, 500.00);
 
+            // deletar a 2 venda:
             MeuBanco.Deletar("Tb_Venda", "Tb_Venda_Id", "2");
 
             // recebe a tabela de dados:
             DataTable Tabela = MeuBanco.SelecionarVendas();
 
             // Laço para percorrer cada linha da tabela::
-            for(int x = 0; x <= (Convert.ToInt16(Tabela.Rows.Count) - 1); x++)
+            for (int x = 0; x <= (Convert.ToInt16(Tabela.Rows.Count) - 1); x++)
             {
 
                 // laço para percorrer os 3 valores das linhas:
-                for(int i = 0; i <= 2; i++)
+                for (int i = 0; i <= 2; i++)
                 {
 
                     // Mostra no console:
